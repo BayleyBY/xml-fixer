@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+
+# Xcode user data
+xcuserdata/
+*.xcuserstate
+
+# Build artifacts
+*.app
+*.app.dSYM/
+*.swiftmodule/
+XMLFixer/build/
+builds/
+
+# Packaged builds
+*.zip
+
+# User data / project XMLs
+260202_XMLs/
+BMW_REFs/
