@@ -278,6 +278,12 @@ struct SourcesSequenceBuilder {
         let xmlDoc = buildXML(from: summaries, options: options)
 
         let outputURL = outputDir.appendingPathComponent(options.outputFilename)
+        let accessing = outputDir.startAccessingSecurityScopedResource()
+        defer {
+            if accessing {
+                outputDir.stopAccessingSecurityScopedResource()
+            }
+        }
 
         // Serialize and prepend DOCTYPE
         var xmlString = xmlDoc.xmlString(options: [.nodePrettyPrint])

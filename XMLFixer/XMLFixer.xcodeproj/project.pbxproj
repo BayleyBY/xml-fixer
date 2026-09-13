@@ -65,6 +65,7 @@
 		EA2A03771B22E4D699421F4B /* XMLNode+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EDE21424109B30F8ADB8152 /* XMLNode+Helpers.swift */; };
 		ED1526AC84A40DCCD3559721 /* PlayheadOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0AB755F4E2DB6FAA5BD4361 /* PlayheadOverlay.swift */; };
 		F0661ADC0EEC2B439A1CE81E /* ReferenceMatchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C4A0F3535413B48F088C6D /* ReferenceMatchEngine.swift */; };
+		F691B326671ED87723943500 /* AppWorkflowSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100944996FE59D4B5B5585D4 /* AppWorkflowSmokeTests.swift */; };
 		F6A93E9487D4E94213C57E3D /* FCPXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B7A48BB310A17509E84C517 /* FCPXMLParser.swift */; };
 		F6D63A1D1322A697829EC6A7 /* TimelinePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4CCEA71F2AD10A1D20F5B1 /* TimelinePanel.swift */; };
 		FF9B98E2ACDF2296D999B844 /* RelinkEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8878FA13FD536B9A263705 /* RelinkEngine.swift */; };
@@ -85,6 +86,7 @@
 		07A5E66A207B8B55FD59143B /* TimelineTrackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineTrackView.swift; sourceTree = "<group>"; };
 		0E35AC713E0A2A5E9F5C6CD1 /* RelinkTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelinkTypes.swift; sourceTree = "<group>"; };
 		0FDCA43C2336C65C66E3812B /* SourcesSequenceBuilderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourcesSequenceBuilderTests.swift; sourceTree = "<group>"; };
+		100944996FE59D4B5B5585D4 /* AppWorkflowSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppWorkflowSmokeTests.swift; sourceTree = "<group>"; };
 		120E69ECCE2C8239E5D6E4B8 /* MediaReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaReference.swift; sourceTree = "<group>"; };
 		16DBFA401374563E2B2C578B /* ClipEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipEffect.swift; sourceTree = "<group>"; };
 		1731564767297188FC4D28BD /* AVAssetTimecodeReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVAssetTimecodeReader.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 		7DFB3B024E8E01B5C8A5A3EA /* TimelineTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineTrack.swift; sourceTree = "<group>"; };
 		7E20BA2E8E38EE2D4C656AFC /* MediaUsageSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaUsageSummary.swift; sourceTree = "<group>"; };
 		7EDE21424109B30F8ADB8152 /* XMLNode+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XMLNode+Helpers.swift"; sourceTree = "<group>"; };
+		8146F816F11DB39EB13EBC8F /* XMLFixer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XMLFixer.entitlements; sourceTree = "<group>"; };
 		88597665DCFBCD6706B2D7B8 /* sample_sequence.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = sample_sequence.xml; sourceTree = "<group>"; };
 		88C4A0F3535413B48F088C6D /* ReferenceMatchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceMatchEngine.swift; sourceTree = "<group>"; };
 		8D4039A67848BB2FA50BAC0E /* KeyframeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyframeView.swift; sourceTree = "<group>"; };
@@ -229,6 +232,7 @@
 		4CE19FDD54B72245533467A2 /* XMLFixer */ = {
 			isa = PBXGroup;
 			children = (
+				8146F816F11DB39EB13EBC8F /* XMLFixer.entitlements */,
 				B57D36C1FF7341B9EE80BC92 /* App */,
 				3D5AE1C3594AADA0AC5F0618 /* Models */,
 				5E08F87C35018F362C2995CD /* Resources */,
@@ -287,6 +291,7 @@
 		80F62D5D06C2AE854EF2586E /* XMLFixerTests */ = {
 			isa = PBXGroup;
 			children = (
+				100944996FE59D4B5B5585D4 /* AppWorkflowSmokeTests.swift */,
 				77A8F0590E453F79E1557CA3 /* FCPXMLMutatorTests.swift */,
 				4A30746E1C6FBBA7024E6E07 /* FCPXMLParserTests.swift */,
 				0FDCA43C2336C65C66E3812B /* SourcesSequenceBuilderTests.swift */,
@@ -405,6 +410,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					424E0AE3745E2064A081CBC7 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = D5DCCFE7824150887E83C182 /* Build configuration list for PBXProject "XMLFixer" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -450,6 +460,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F691B326671ED87723943500 /* AppWorkflowSmokeTests.swift in Sources */,
 				DA1C4F451FF6AF350F79C074 /* FCPXMLMutatorTests.swift in Sources */,
 				1CE3C76A16F4D1FEDF61FF96 /* FCPXMLParserTests.swift in Sources */,
 				6CE150A6441469204C88C766 /* SourcesSequenceBuilderTests.swift in Sources */,
@@ -535,10 +546,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
-				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -546,7 +555,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixerTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/XML Fixer.app/Contents/MacOS/XML Fixer";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RPB XML Toolkit.app/Contents/MacOS/RPB XML Toolkit";
 			};
 			name = Debug;
 		};
@@ -610,10 +619,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = XMLFixer/XMLFixer.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = XMLFixer/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -621,7 +631,8 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixer;
-				PRODUCT_NAME = "XML Fixer";
+				PRODUCT_MODULE_NAME = XML_Fixer;
+				PRODUCT_NAME = "RPB XML Toolkit";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -630,10 +641,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
-				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -641,7 +650,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixerTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/XML Fixer.app/Contents/MacOS/XML Fixer";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RPB XML Toolkit.app/Contents/MacOS/RPB XML Toolkit";
 			};
 			name = Release;
 		};
@@ -712,10 +721,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_ENTITLEMENTS = XMLFixer/XMLFixer.entitlements;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = XMLFixer/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -723,7 +734,8 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixer;
-				PRODUCT_NAME = "XML Fixer";
+				PRODUCT_MODULE_NAME = XML_Fixer;
+				PRODUCT_NAME = "RPB XML Toolkit";
 				SDKROOT = macosx;
 			};
 			name = Release;

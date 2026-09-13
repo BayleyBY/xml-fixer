@@ -23,6 +23,13 @@ struct ExportService {
         let outputName = baseName + options.filenameSuffix + ".xml"
         let outputURL = outputDir.appendingPathComponent(outputName)
 
+        let accessing = outputDir.startAccessingSecurityScopedResource()
+        defer {
+            if accessing {
+                outputDir.stopAccessingSecurityScopedResource()
+            }
+        }
+
         // Repair reel metadata if enabled
         let repairedCount = options.shouldRepairReelMetadata
             ? ReelMetadataRepairer.repairReelMetadata(in: document.xmlDocument)

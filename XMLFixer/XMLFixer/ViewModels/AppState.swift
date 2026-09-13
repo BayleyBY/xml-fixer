@@ -207,10 +207,8 @@ final class AppState {
     // MARK: - Actions
 
     func importFiles(urls: [URL]) {
-        let resolvedURLs = Self.resolveXMLURLs(from: urls)
         let existingURLs = Set(documents.map(\.sourceURL))
-        let xmlURLs = resolvedURLs.filter { !existingURLs.contains($0) }
-        guard !xmlURLs.isEmpty else { return }
+        guard !urls.isEmpty else { return }
 
         isProcessing = true
 
@@ -218,6 +216,18 @@ final class AppState {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             var parsed: [FCPXMLDocument] = []
             var lastError: String?
+
+            let scopedURLs = urls.map { url in
+                (url: url, isAccessing: url.startAccessingSecurityScopedResource())
+            }
+            defer {
+                for scoped in scopedURLs where scoped.isAccessing {
+                    scoped.url.stopAccessingSecurityScopedResource()
+                }
+            }
+
+            let resolvedURLs = Self.resolveXMLURLs(from: urls)
+            let xmlURLs = resolvedURLs.filter { !existingURLs.contains($0) }
 
             for url in xmlURLs {
                 do {
@@ -233,7 +243,9 @@ final class AppState {
                 self.documents.append(contentsOf: parsed)
                 self.refreshMediaReferences()
                 self.isProcessing = false
-                if let lastError {
+                if xmlURLs.isEmpty {
+                    self.setStatus("No new XML files found")
+                } else if let lastError {
                     self.setStatus(lastError)
                 } else {
                     self.setStatus("Loaded \(parsed.count) XML\(parsed.count == 1 ? "" : "s")")
@@ -360,14 +372,16 @@ final class AppState {
 
     func exportAll() {
         isProcessing = true
+        let docs = documents
+        let options = exportOptions
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self else { return }
-            let results = ExportService.exportAll(documents: self.documents, options: self.exportOptions)
+            let results = ExportService.exportAll(documents: docs, options: options)
             let successCount = results.filter(\.success).count
             let failedNames = results.filter { !$0.success }.map { $0.outputURL.lastPathComponent }
 
             DispatchQueue.main.async {
+                guard let self else { return }
                 self.isProcessing = false
                 if failedNames.isEmpty {
                     self.setStatus("Exported \(successCount) files")
@@ -380,7 +394,16 @@ final class AppState {
 
     func exportCSV() {
         let csv = CSVExporter.export(mediaReferences: filteredMedia)
-        CSVExporter.showSavePanelAndExport(csv: csv)
+        CSVExporter.showSavePanelAndExport(csv: csv) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let url):
+                    self?.setStatus("Exported CSV to \(url.lastPathComponent)")
+                case .failure(let error):
+                    self?.setStatus("CSV export failed: \(error.localizedDescription)")
+                }
+            }
+        }
     }
 
     func selectAllVisibleMedia() {
@@ -629,6 +652,7 @@ final class AppState {
         }
         let count = matches.filter { $0.selectedCandidateIndex != nil }.count
         setStatus("Matched \(count) reference files")
+        autoLoadReferencePlayer()
     }
 
     func matchTimecodeToReference(sequenceID: UUID) {
@@ -738,6 +762,7 @@ final class AppState {
 
         let coordinator = PlaybackCoordinator(
             referenceURL: url,
+            accessScopeURL: match.accessScopeURL,
             timelineStartTC: startTC,
             referenceStartTC: refTC,
             timebase: timebase,
@@ -927,6 +952,8 @@ class PlaybackCoordinator {
     var currentTimecodeString = "00:00:00:00"
     var scrubPosition: Double = 0
 
+    private let accessScopeURL: URL?
+    private let isAccessingSecurityScopedURL: Bool
     private let timelineStartTC: Timecode
     private let referenceStartTC: Timecode
     private let timebase: Int
@@ -935,7 +962,9 @@ class PlaybackCoordinator {
 
     var onPlayheadFrameChanged: ((Int) -> Void)?
 
-    init(referenceURL: URL, timelineStartTC: Timecode, referenceStartTC: Timecode, timebase: Int, totalDurationFrames: Int) {
+    init(referenceURL: URL, accessScopeURL: URL? = nil, timelineStartTC: Timecode, referenceStartTC: Timecode, timebase: Int, totalDurationFrames: Int) {
+        self.accessScopeURL = accessScopeURL
+        self.isAccessingSecurityScopedURL = accessScopeURL?.startAccessingSecurityScopedResource() ?? false
         self.timelineStartTC = timelineStartTC
         self.referenceStartTC = referenceStartTC
         self.timebase = timebase
@@ -1012,6 +1041,9 @@ class PlaybackCoordinator {
     deinit {
         if let observer = timeObserver {
             player.removeTimeObserver(observer)
+        }
+        if isAccessingSecurityScopedURL {
+            accessScopeURL?.stopAccessingSecurityScopedResource()
         }
     }
 }

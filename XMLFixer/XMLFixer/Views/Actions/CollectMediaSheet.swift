@@ -5,6 +5,7 @@ struct CollectMediaSheet: View {
     @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
 
+    @State private var sourceAccessURL: URL? = nil
     @State private var destinationURL: URL? = nil
     @State private var keepPaths = true
     @State private var stripLevels: Double = 0
@@ -15,41 +16,65 @@ struct CollectMediaSheet: View {
 
     /// Media that have a pathURL pointing to an existing file on disk.
     private var linkedMedia: [MediaReference] {
-        appState.mediaReferences.filter { media in
-            guard let pathStr = media.pathURL else { return false }
-            let path: String
-            if pathStr.hasPrefix("file://") {
-                path = URL(string: pathStr)?.path ?? pathStr
-            } else {
-                path = pathStr
+        withSourceAccess {
+            appState.mediaReferences.filter { media in
+                guard let pathStr = media.pathURL else { return false }
+                let path: String
+                if pathStr.hasPrefix("file://") {
+                    path = URL(string: pathStr)?.path ?? pathStr
+                } else {
+                    path = pathStr
+                }
+                return FileManager.default.fileExists(atPath: path)
             }
-            return FileManager.default.fileExists(atPath: path)
         }
     }
 
     /// Total file size of all linked media in bytes.
     private var totalFileSize: Int64 {
-        linkedMedia.reduce(into: Int64(0)) { total, media in
-            guard let path = resolvedPath(for: media) else { return }
-            let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? Int64) ?? 0
-            total += size
+        withSourceAccess {
+            linkedMedia.reduce(into: Int64(0)) { total, media in
+                guard let path = resolvedPath(for: media) else { return }
+                let size = (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? Int64) ?? 0
+                total += size
+            }
         }
     }
 
     /// Max path depth across all linked media (for slider range).
     private var maxPathDepth: Int {
-        let depths = linkedMedia.compactMap { media -> Int? in
-            guard let resolved = resolvedPath(for: media) else { return nil }
-            // Count directory components (exclude filename itself)
-            return URL(fileURLWithPath: resolved).pathComponents.dropFirst().dropLast().count
+        withSourceAccess {
+            let depths = linkedMedia.compactMap { media -> Int? in
+                guard let resolved = resolvedPath(for: media) else { return nil }
+                // Count directory components (exclude filename itself)
+                return URL(fileURLWithPath: resolved).pathComponents.dropFirst().dropLast().count
+            }
+            return depths.max() ?? 1
         }
-        return depths.max() ?? 1
     }
 
     var body: some View {
         VStack(spacing: 16) {
             Text("Collect Linked Media")
                 .font(.headline)
+
+            // Source access
+            HStack {
+                Text("Source folder:")
+                    .foregroundStyle(.secondary)
+                if let source = sourceAccessURL {
+                    Text(source.path)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .help(source.path)
+                } else {
+                    Text("Use current file access")
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                Button("Grant Access...") { browseForSourceAccess() }
+            }
 
             // Destination
             HStack {
@@ -174,6 +199,17 @@ struct CollectMediaSheet: View {
 
     // MARK: - Helpers
 
+    private func withSourceAccess<T>(_ work: () -> T) -> T {
+        let url = sourceAccessURL
+        let accessing = url?.startAccessingSecurityScopedResource() ?? false
+        defer {
+            if accessing {
+                url?.stopAccessingSecurityScopedResource()
+            }
+        }
+        return work()
+    }
+
     private func resolvedPath(for media: MediaReference) -> String? {
         guard let pathStr = media.pathURL else { return nil }
         if pathStr.hasPrefix("file://") {
@@ -226,6 +262,20 @@ struct CollectMediaSheet: View {
 
     // MARK: - Actions
 
+    private func browseForSourceAccess() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false
+        panel.message = "Select the folder that contains the linked source media"
+        panel.prompt = "Grant Access"
+
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            sourceAccessURL = url
+        }
+    }
+
     private func browseForDestination() {
         let panel = NSOpenPanel()
         panel.canChooseDirectories = true
@@ -249,10 +299,21 @@ struct CollectMediaSheet: View {
         copiedCount = 0
         errorMessages = []
 
-        let accessing = destRoot.startAccessingSecurityScopedResource()
+        let sourceRoot = sourceAccessURL
+        let sourceAccessing = sourceRoot?.startAccessingSecurityScopedResource() ?? false
+        let destinationAccessing = destRoot.startAccessingSecurityScopedResource()
 
         let totalCount = media.count
         Task.detached(priority: .userInitiated) {
+            defer {
+                if sourceAccessing {
+                    sourceRoot?.stopAccessingSecurityScopedResource()
+                }
+                if destinationAccessing {
+                    destRoot.stopAccessingSecurityScopedResource()
+                }
+            }
+
             let fm = FileManager.default
             var errors: [String] = []
             var copied = 0
@@ -294,8 +355,6 @@ struct CollectMediaSheet: View {
                     copied += 1
                 }
             }
-
-            if accessing { destRoot.stopAccessingSecurityScopedResource() }
 
             await MainActor.run {
                 isCopying = false

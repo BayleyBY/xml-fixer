@@ -142,7 +142,12 @@ struct ReferenceMatchSheet: View {
                 }
                 Spacer()
                 Button("Apply") {
-                    appState.applyReferenceMatches(matches)
+                    let scopedMatches = matches.map { match in
+                        var copy = match
+                        copy.accessScopeURL = referenceDirectory
+                        return copy
+                    }
+                    appState.applyReferenceMatches(scopedMatches)
                     dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
@@ -229,6 +234,7 @@ struct ReferenceMatchSheet: View {
                 newMatches[i].userConfirmed = true
                 newMatches[i].status = .matched
             }
+            newMatches[i].accessScopeURL = referenceDirectory
         }
 
         matches = newMatches
@@ -240,6 +246,7 @@ struct ReferenceMatchSheet: View {
     private func readEmbeddedTimecodes() {
         guard !matches.isEmpty else { return }
         isReadingTimecodes = true
+        let accessScopeURL = referenceDirectory
         let timebase = appState.documents.first?.sequences.first?.timebase ?? 25
 
         // Capture snapshot: list of (matchIndex, candidateIndex, url) to read
@@ -251,6 +258,13 @@ struct ReferenceMatchSheet: View {
         }
 
         Task {
+            let accessing = accessScopeURL?.startAccessingSecurityScopedResource() ?? false
+            defer {
+                if accessing {
+                    accessScopeURL?.stopAccessingSecurityScopedResource()
+                }
+            }
+
             // Read all timecodes from snapshot
             var results: [(candidateID: UUID, tc: Timecode)] = []
             for job in jobs {

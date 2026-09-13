@@ -4,7 +4,7 @@ import SwiftUI
 struct XMLFixerApp: App {
     @State private var appState = AppState()
 
-    static let buildVersion = "V009"
+    static let buildVersion = "V011"
     static let appVersion: String = {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
     }()
@@ -17,9 +17,9 @@ struct XMLFixerApp: App {
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About XML Fixer") {
+                Button("About RPB XML Toolkit") {
                     NSApp.orderFrontStandardAboutPanel(options: [
-                        .applicationName: "XML Fixer",
+                        .applicationName: "RPB XML Toolkit",
                         .applicationVersion: Self.appVersion,
                         .version: Self.buildVersion,
                         .credits: NSAttributedString(

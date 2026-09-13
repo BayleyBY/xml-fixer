@@ -23,14 +23,26 @@ struct CSVExporter {
         return lines.joined(separator: "\n")
     }
 
-    static func showSavePanelAndExport(csv: String) {
+    static func showSavePanelAndExport(csv: String, completion: ((Result<URL, Error>) -> Void)? = nil) {
         let panel = NSSavePanel()
         panel.allowedContentTypes = [UTType.commaSeparatedText]
         panel.nameFieldStringValue = "media_export.csv"
         panel.canCreateDirectories = true
         panel.begin { response in
             guard response == .OK, let url = panel.url else { return }
-            try? csv.write(to: url, atomically: true, encoding: .utf8)
+            let accessing = url.startAccessingSecurityScopedResource()
+            defer {
+                if accessing {
+                    url.stopAccessingSecurityScopedResource()
+                }
+            }
+
+            do {
+                try csv.write(to: url, atomically: true, encoding: .utf8)
+                completion?(.success(url))
+            } catch {
+                completion?(.failure(error))
+            }
         }
     }
 

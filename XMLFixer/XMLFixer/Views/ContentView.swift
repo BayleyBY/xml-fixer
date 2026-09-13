@@ -78,6 +78,9 @@ struct ContentView: View {
                 appState.statusMessage = "Import failed: \(error.localizedDescription)"
             }
         }
+        .onOpenURL { url in
+            appState.importFiles(urls: [url])
+        }
         .onDrop(of: [.fileURL], isTargeted: nil) { providers in
             for provider in providers {
                 _ = provider.loadObject(ofClass: URL.self) { url, _ in

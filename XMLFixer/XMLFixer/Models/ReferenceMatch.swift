@@ -40,16 +40,18 @@ struct ReferenceMatch: Identifiable {
     let sequenceID: UUID
     let sequenceName: String
     let parentDocumentID: UUID
+    var accessScopeURL: URL?
     var candidates: [ReferenceCandidate]
     var selectedCandidateIndex: Int?
     var status: ReferenceMatchStatus
     var userConfirmed: Bool
 
-    init(id: UUID = UUID(), sequenceID: UUID, sequenceName: String, parentDocumentID: UUID, candidates: [ReferenceCandidate] = [], selectedCandidateIndex: Int? = nil, status: ReferenceMatchStatus = .unmatched, userConfirmed: Bool = false) {
+    init(id: UUID = UUID(), sequenceID: UUID, sequenceName: String, parentDocumentID: UUID, accessScopeURL: URL? = nil, candidates: [ReferenceCandidate] = [], selectedCandidateIndex: Int? = nil, status: ReferenceMatchStatus = .unmatched, userConfirmed: Bool = false) {
         self.id = id
         self.sequenceID = sequenceID
         self.sequenceName = sequenceName
         self.parentDocumentID = parentDocumentID
+        self.accessScopeURL = accessScopeURL
         self.candidates = candidates
         self.selectedCandidateIndex = selectedCandidateIndex
         self.status = status
