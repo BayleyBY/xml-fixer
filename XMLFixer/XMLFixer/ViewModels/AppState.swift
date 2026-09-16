@@ -51,6 +51,7 @@ final class AppState {
     // MARK: - Relink state
     var isShowingRelinkSheet = false
     var isShowingCollectSheet = false
+    var isShowingTrimMediaSheet = false
 
     // MARK: - Denest state
     var showDenestAlert = false

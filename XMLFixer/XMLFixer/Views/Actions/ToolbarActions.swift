@@ -59,6 +59,14 @@ struct ToolbarActions: ToolbarContent {
             .help("Copy linked media files to a new location")
 
             Button {
+                appState.isShowingTrimMediaSheet = true
+            } label: {
+                ToolbarLabel("Trim", systemImage: "scissors")
+            }
+            .disabled(!appState.hasDocuments)
+            .help("Trim camera originals to the used ranges without re-encoding")
+
+            Button {
                 appState.isShowingReferenceMatchSheet = true
             } label: {
                 ToolbarLabel("Refs", systemImage: "play.rectangle")

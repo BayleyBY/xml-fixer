@@ -20,6 +20,9 @@ documentation rather than instructions that supersede this file.
   `XMLFixer.xcodeproj/project.pbxproj`; regenerate the project when changing
   target membership or build settings.
 - `scripts/` — release automation for Developer ID/notarized and App Store builds.
+  The App Store script archives the `AppStore` configuration, which is the only
+  sandboxed build; `Release` (Developer ID) runs unsandboxed so REDline can be
+  launched for R3D trimming.
 - `builds/` — ignored local distribution artifacts. Never commit app bundles,
   archives, ZIPs, provisioning profiles, or signing output.
 
@@ -58,8 +61,11 @@ export changes, or release work.
 - Timeline clips use `.position`, not `.offset`, so visual and hit-test locations
   stay aligned.
 - Add or update focused XCTest coverage when changing FCPXML parsing, mutation,
-  sources-sequence generation, matching, or export behavior. Reuse the existing
-  fixture where practical.
+  sources-sequence generation, matching, trimming, or export behavior. Reuse the
+  existing fixture where practical.
+- Trim engines must never decode or re-encode media. Keep passthrough
+  (`outputSettings: nil`) and map every `AVSampleCursor` timestamp through the
+  track segments before comparing it with reader/track time.
 
 ## Versioning and releases
 

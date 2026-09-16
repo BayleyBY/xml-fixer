@@ -79,12 +79,12 @@ enum FileScanner {
             }
         }
 
-        // Add synthetic R3D entries for base names that don't already have a direct match
+        // Add synthetic R3D entries for base names that don't already have a real, unsplit .R3D.
+        // Sidecars named after the clip (A001_C001.xml / .rtn / .rmd) must not suppress the entry.
         for (baseName, syntheticFile) in r3dSyntheticEntries {
             let existing = fileMap[baseName] ?? []
-            // Only add if there's no non-synthetic file already matching the base name
-            let hasDirectMatch = existing.contains { !$0.isR3DSplit }
-            if !hasDirectMatch {
+            let hasDirectR3D = existing.contains { !$0.isR3DSplit && $0.fileExtension == "r3d" }
+            if !hasDirectR3D {
                 fileMap[baseName, default: []].append(syntheticFile)
             }
         }
