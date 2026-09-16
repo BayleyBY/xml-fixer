@@ -34,6 +34,8 @@ Get the latest **Developer ID–signed and Apple-notarized** alpha build from th
   batch-rename timelines.
 - Export updated XMLs, a concise media CSV, or a Sources Sequence XML containing
   the best-length source ranges for a conform workflow.
+- Trim camera originals down to the used ranges (plus handles) without
+  re-encoding, similar to DaVinci Resolve's Media Management trim mode.
 - Calculate common scale and resize values without leaving the app.
 
 ## Typical workflow
@@ -42,7 +44,8 @@ Get the latest **Developer ID–signed and Apple-notarized** alpha build from th
 2. **Review** the consolidated media list and timeline view.
 3. **Repair** paths, names, timecode, reel metadata, or sequence structure.
 4. **Relink or collect** media when preparing a handoff.
-5. **Export** revised XMLs, a Sources Sequence XML, and/or a CSV report.
+5. **Trim** camera originals to only the frames the edit uses.
+6. **Export** revised XMLs, a Sources Sequence XML, and/or a CSV report.
 
 All XML mutations are applied to an in-memory document and can be undone during
 the session. The original files are not overwritten unless you explicitly choose
@@ -56,6 +59,40 @@ their location as the export destination.
 | Timeline cleanup | Batch timeline renaming, nested-sequence flattening, audio stripping, and clip removal |
 | Timecode & review | Source-timecode display, timeline start-timecode editing, and synchronized reference playback |
 | Delivery | Updated XML batch export, CSV media report, and Sources Sequence XML export |
+| Camera originals | Lossless trimming of QuickTime (ProRes, DNx, H.264, HEVC) and image sequences (EXR, DPX, DNG, ARRIRAW .ari); R3D via REDline when installed; everything else copied whole |
+
+## Trimming camera originals
+
+The **Trim** toolbar action scans a folder of camera-original media, matches each
+source used in the loaded XMLs by filename stem (proxies such as `A001C002.mov`
+match `A001C002.R3D`, `A001C002.mxf`, or `A001C002.0001001.exr`), and writes
+trimmed copies containing only the used ranges plus handles.
+
+- Ranges are mapped through **source timecode**: the XML file's start timecode
+  plus the clip in/out points is located in the original's embedded timecode
+  track, so proxies that start at a different point or run at a different frame
+  rate still map correctly. Files without timecode fall back to frame offsets
+  and are flagged.
+- Nothing is re-encoded. QuickTime files are rewritten with AVFoundation
+  passthrough, so codec, bit depth, and metadata stay untouched. Cuts on
+  long-GOP codecs (H.264, HEVC) snap outward to the nearest keyframes and the
+  extra frames are reported.
+- A new timecode track is written so the trimmed file starts at the correct
+  source timecode. MP4 containers cannot carry one, which is reported.
+- Image sequences are trimmed by copying only the frames in range.
+- RED `.R3D` clips (including multi-segment `_001`, `_002` clips inside `.RDC`
+  folders) are trimmed with REDline when REDCINE-X Pro is installed (a
+  **Locate...** button lets you point at the executable). Output follows RED's
+  `<clip>.RDC/<clip>_001.R3D` layout with audio, absolute and edge timecode, and
+  reel ID preserved. Without REDline, and for ARRIRAW MXF, BRAW, and other formats
+  with no lossless trimmer, the whole clip is copied and flagged.
+- Output keeps the original filename and mirrors the folder structure under the
+  destination. When a source has several used ranges farther apart than the
+  merge gap, they become `name_trim01.ext`, `name_trim02.ext`, and so on.
+
+R3D trimming shells out to an external tool, so the direct-download build runs
+without the macOS App Sandbox. The App Store build keeps the sandbox and copies
+R3D clips whole.
 
 ## Build from source
 
@@ -79,6 +116,10 @@ xcodebuild -project XMLFixer/XMLFixer.xcodeproj -scheme XMLFixer \
   -configuration Release -derivedDataPath /tmp/xml-fixer-derived build \
   CODE_SIGNING_ALLOWED=NO
 ```
+
+To exercise the trimmer on your own media, drop QuickTime files into
+`$TMPDIR/qt-trim-manual/` and run the `QuickTimeTrimManualMediaTests` test; it
+trims each file and verifies codec, audio tracks, keyframe alignment, and timecode.
 
 The local release app is written to:
 

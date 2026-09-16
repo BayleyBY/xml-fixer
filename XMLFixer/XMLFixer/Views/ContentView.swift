@@ -57,6 +57,9 @@ struct ContentView: View {
         .sheet(isPresented: $appState.isShowingCollectSheet) {
             CollectMediaSheet()
         }
+        .sheet(isPresented: $appState.isShowingTrimMediaSheet) {
+            TrimMediaSheet()
+        }
         .sheet(isPresented: $appState.isShowingBatchTimelineRename) {
             BatchRenameTimelinesSheet()
         }
