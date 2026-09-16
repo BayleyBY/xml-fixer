@@ -28,7 +28,15 @@ enum AVAssetTimecodeReader {
             reader.add(output)
             reader.startReading()
 
-            guard let sampleBuffer = output.copyNextSampleBuffer() else { return nil }
+            // AVAssetReader can emit empty marker buffers (edit boundaries) before the first real sample.
+            var firstSample: CMSampleBuffer? = nil
+            while let candidate = output.copyNextSampleBuffer() {
+                if CMSampleBufferGetNumSamples(candidate) > 0, CMSampleBufferGetDataBuffer(candidate) != nil {
+                    firstSample = candidate
+                    break
+                }
+            }
+            guard let sampleBuffer = firstSample else { return nil }
 
             // Get the timecode format description
             guard let formatDesc = CMSampleBufferGetFormatDescription(sampleBuffer) else { return nil }
