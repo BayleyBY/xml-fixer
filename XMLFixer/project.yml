@@ -5,6 +5,10 @@ options:
     macOS: "14.0"
   xcodeVersion: "16.0"
   minimumXcodeGenVersion: "2.0"
+configs:
+  Debug: debug
+  Release: release
+  AppStore: release
 settings:
   base:
     SWIFT_VERSION: "5.9"
@@ -25,12 +29,19 @@ targets:
         ENABLE_PREVIEWS: true
         COMBINE_HIDPI_IMAGES: true
         CODE_SIGN_STYLE: Automatic
+        # Developer ID / direct-download builds run unsandboxed so vendor CLIs
+        # (REDline) can reach user media. The AppStore configuration re-enables
+        # the sandbox with its own entitlements file.
         CODE_SIGN_ENTITLEMENTS: XMLFixer/XMLFixer.entitlements
-        ENABLE_APP_SANDBOX: YES
+        ENABLE_APP_SANDBOX: NO
         ENABLE_HARDENED_RUNTIME: YES
       configs:
         Release:
           CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+        AppStore:
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+          CODE_SIGN_ENTITLEMENTS: XMLFixer/XMLFixer.AppStore.entitlements
+          ENABLE_APP_SANDBOX: YES
     info:
       path: XMLFixer/App/Info.plist
       properties:
