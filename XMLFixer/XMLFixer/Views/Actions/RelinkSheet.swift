@@ -149,7 +149,9 @@ struct RelinkSheet: View {
             }
         }
         .padding()
-        .frame(width: 700, height: 550)
+        .frame(minWidth: 700, idealWidth: 700, maxWidth: .infinity,
+               minHeight: 550, idealHeight: 550, maxHeight: .infinity)
+        .resizableSheet(minSize: CGSize(width: 700, height: 550))
     }
 
     // MARK: - Actions

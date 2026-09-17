@@ -61,6 +61,7 @@
 		B155CA23D1081A0C2C419E04 /* QuickTimeTrimManualMediaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF939AACC275C518AFB699D9 /* QuickTimeTrimManualMediaTests.swift */; };
 		B47CC645E686F40E9CE71491 /* BatchRenameSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E444E9694A977594A5293D77 /* BatchRenameSheet.swift */; };
 		B675FA751AD1370FF44FADB8 /* RelinkSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17998CEA7F40DF53629A6B09 /* RelinkSheet.swift */; };
+		B8D14B25614E4F7A92F297D7 /* ResizableSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF95D8BE3C6750BD2559BC1A /* ResizableSheet.swift */; };
 		BC575B522812701D599BCFF9 /* Timecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2876AE13B0B20D308006259 /* Timecode.swift */; };
 		BDCB5C632F7E7033AC5C907F /* XMLFileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27DAE1E43436EE35ACF0EC0E /* XMLFileRow.swift */; };
 		C0409B606EFFFBE678DA4361 /* SourcesSequenceBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98ABC16B246185B43ABF6DE4 /* SourcesSequenceBuilder.swift */; };
@@ -181,6 +182,7 @@
 		FC3DBD93BBC665B25A12D13D /* SourcesExportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourcesExportSheet.swift; sourceTree = "<group>"; };
 		FD70BEE7BEC53C0812F551A4 /* XMLFixerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLFixerApp.swift; sourceTree = "<group>"; };
 		FEF0626A8821703F8FAD147C /* FCPXMLMutator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FCPXMLMutator.swift; sourceTree = "<group>"; };
+		FF95D8BE3C6750BD2559BC1A /* ResizableSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -358,6 +360,7 @@
 			isa = PBXGroup;
 			children = (
 				F9F37037854132CB963670FD /* DropZoneView.swift */,
+				FF95D8BE3C6750BD2559BC1A /* ResizableSheet.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -568,6 +571,7 @@
 				FF9B98E2ACDF2296D999B844 /* RelinkEngine.swift in Sources */,
 				B675FA751AD1370FF44FADB8 /* RelinkSheet.swift in Sources */,
 				34DE85920DC8E5A8046E8CFF /* RelinkTypes.swift in Sources */,
+				B8D14B25614E4F7A92F297D7 /* ResizableSheet.swift in Sources */,
 				C3123E9919C6E90D21ED372B /* ScaleCalculatorSheet.swift in Sources */,
 				80C0114C8008ED449D4F191A /* SequenceInfo.swift in Sources */,
 				6A677509E005D6E6082E471F /* SidebarView.swift in Sources */,

@@ -188,6 +188,7 @@ struct SourcesExportSheet: View {
         }
         .frame(minWidth: 900, idealWidth: 900, maxWidth: .infinity,
                minHeight: 560, idealHeight: 560, maxHeight: .infinity)
+        .resizableSheet(minSize: CGSize(width: 900, height: 560))
         .onAppear {
             rawSummaries = SourcesSequenceBuilder.collectUsages(from: appState.documents)
         }

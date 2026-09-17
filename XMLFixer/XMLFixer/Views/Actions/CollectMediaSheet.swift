@@ -194,7 +194,9 @@ struct CollectMediaSheet: View {
             }
         }
         .padding()
-        .frame(width: 650, height: 520)
+        .frame(minWidth: 650, idealWidth: 650, maxWidth: .infinity,
+               minHeight: 520, idealHeight: 520, maxHeight: .infinity)
+        .resizableSheet(minSize: CGSize(width: 650, height: 520))
     }
 
     // MARK: - Helpers
