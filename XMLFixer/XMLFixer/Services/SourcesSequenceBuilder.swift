@@ -122,7 +122,7 @@ struct SourcesSequenceBuilder {
         addRateElement(to: seqTimecode, timebase: options.sequenceTimebase, ntsc: options.ntsc)
         addChild(to: seqTimecode, name: "string", value: "01:00:00:00")
         addChild(to: seqTimecode, name: "frame", value: String(options.sequenceTimebase * 3600))
-        addChild(to: seqTimecode, name: "displayformat", value: options.ntsc ? "DF" : "NDF")
+        addChild(to: seqTimecode, name: "displayformat", value: "NDF")  // frame count above assumes NDF
         sequenceElem.addChild(seqTimecode)
 
         // Duration placeholder — will be updated after clips are laid out

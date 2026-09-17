@@ -112,7 +112,8 @@ struct TrimMediaSheet: View {
             }
         }
         .padding()
-        .frame(width: 940, height: 680)
+        .frame(minWidth: 940, idealWidth: 940, maxWidth: .infinity,
+               minHeight: 680, idealHeight: 680, maxHeight: .infinity)
         .onAppear {
             rawSummaries = SourcesSequenceBuilder.collectUsages(from: appState.documents)
             rebuildPlan()
