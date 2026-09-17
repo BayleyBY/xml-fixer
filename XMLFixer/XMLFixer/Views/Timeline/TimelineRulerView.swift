@@ -37,8 +37,14 @@ struct TimelineRulerView: View {
                 majorTickInterval = 10
             } else if secondWidth > 3 {
                 majorTickInterval = 30
-            } else {
+            } else if secondWidth > 1 {
                 majorTickInterval = 60
+            } else if secondWidth > 0.4 {
+                majorTickInterval = 300
+            } else if secondWidth > 0.1 {
+                majorTickInterval = 600
+            } else {
+                majorTickInterval = 1800
             }
 
             let totalSeconds = totalFrames / max(1, effectiveTimebase) + 1

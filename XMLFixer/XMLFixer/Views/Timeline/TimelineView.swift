@@ -18,6 +18,10 @@ struct TimelineView: View {
     private let trackHeight: CGFloat = 28
     private let trackLabelWidth: CGFloat = 30
     private let rulerHeight: CGFloat = 24
+    // Low enough that multi-hour timelines can still fit the panel.
+    private let minZoom: Double = 0.001
+    private let maxZoom: Double = 20
+    private let fitTrailingGap: CGFloat = 40
 
     private var videoColorMap: [String: Color] {
         ClipColorAssigner.buildColorMap(from: timeline.uniqueFilenames, trackType: .video)
@@ -27,7 +31,7 @@ struct TimelineView: View {
     }
 
     private var pixelsPerFrame: CGFloat {
-        max(0.05, CGFloat(zoom) * 0.5)
+        CGFloat(zoom) * 0.5
     }
 
     private var timelineWidth: CGFloat {
@@ -95,6 +99,7 @@ struct TimelineView: View {
                         .onAppear {
                             visibleWidth = geo.size.width
                             visibleHeight = geo.size.height
+                            zoomToFit()
                         }
                         .onChange(of: geo.size.width) { _, newWidth in
                             visibleWidth = newWidth
@@ -106,11 +111,13 @@ struct TimelineView: View {
             )
         }
         .background(Color(white: 0.08))
+        // Each newly selected sequence opens fitted to the panel; edits to the same sequence keep the zoom.
+        .onChange(of: timeline.sequenceID) { zoomToFit() }
         .onAppear {
             magnifyMonitor = NSEvent.addLocalMonitorForEvents(matching: .magnify) { event in
                 let factor = 1.0 + event.magnification
                 withAnimation(.interactiveSpring(response: 0.1, dampingFraction: 0.9)) {
-                    zoom = max(0.1, min(20, zoom * factor))
+                    zoom = max(minZoom, min(maxZoom, zoom * factor))
                 }
                 return event
             }
@@ -119,7 +126,7 @@ struct TimelineView: View {
                 let delta = event.scrollingDeltaY
                 let factor = 1.0 + (delta * 0.01)
                 withAnimation(.interactiveSpring(response: 0.1, dampingFraction: 0.9)) {
-                    zoom = max(0.1, min(20, zoom * factor))
+                    zoom = max(minZoom, min(maxZoom, zoom * factor))
                 }
                 return nil
             }
@@ -313,7 +320,7 @@ struct TimelineView: View {
 
             // Zoom controls group
             HStack(spacing: 2) {
-                Button { zoom = max(0.1, zoom * 0.7) } label: {
+                Button { zoom = max(minZoom, zoom * 0.7) } label: {
                     Image(systemName: "minus")
                         .font(.system(size: 10, weight: .medium))
                         .frame(width: 22, height: 18)
@@ -321,12 +328,12 @@ struct TimelineView: View {
                 }
                 .buttonStyle(.plain)
 
-                Text("\(Int(zoom * 100))%")
+                Text(zoom < 0.01 ? "<1%" : "\(Int(zoom * 100))%")
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundStyle(.secondary)
                     .frame(width: 34)
 
-                Button { zoom = min(20, zoom * 1.4) } label: {
+                Button { zoom = min(maxZoom, zoom * 1.4) } label: {
                     Image(systemName: "plus")
                         .font(.system(size: 10, weight: .medium))
                         .frame(width: 22, height: 18)
@@ -336,10 +343,7 @@ struct TimelineView: View {
 
                 Rectangle().fill(.white.opacity(0.1)).frame(width: 1, height: 12)
 
-                Button {
-                    let fitted = (visibleWidth * 2.0) / CGFloat(timeline.totalDurationFrames)
-                    zoom = max(0.1, min(20, fitted))
-                } label: {
+                Button { zoomToFit() } label: {
                     Image(systemName: "arrow.left.and.right")
                         .font(.system(size: 10, weight: .medium))
                         .frame(width: 22, height: 18)
@@ -357,6 +361,15 @@ struct TimelineView: View {
     }
 
     // MARK: - Actions
+
+    private func zoomToFit() {
+        guard timeline.totalDurationFrames > 0 else { return }
+        // Leave a visible gap after the last clip so the end of the timeline reads as the end.
+        let available = max(1, visibleWidth - trackLabelWidth - fitTrailingGap)
+        // pixelsPerFrame = zoom * 0.5
+        let fitted = Double(available * 2.0) / Double(timeline.totalDurationFrames)
+        zoom = max(minZoom, min(maxZoom, fitted))
+    }
 
     private func clearSelection() {
         appState.selectedMediaIDs.removeAll()
