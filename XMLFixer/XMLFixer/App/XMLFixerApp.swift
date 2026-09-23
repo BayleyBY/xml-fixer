@@ -17,9 +17,9 @@ struct XMLFixerApp: App {
         }
         .commands {
             CommandGroup(replacing: .appInfo) {
-                Button("About RPB XML Toolkit") {
+                Button("About Republic Wash & Cut") {
                     NSApp.orderFrontStandardAboutPanel(options: [
-                        .applicationName: "RPB XML Toolkit",
+                        .applicationName: "Republic Wash & Cut",
                         .applicationVersion: Self.appVersion,
                         .version: Self.buildVersion,
                         .credits: NSAttributedString(

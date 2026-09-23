@@ -23,7 +23,7 @@ targets:
       base:
         INFOPLIST_FILE: XMLFixer/App/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.xmlfixer.XMLFixer
-        PRODUCT_NAME: RPB XML Toolkit
+        PRODUCT_NAME: Republic Wash & Cut
         PRODUCT_MODULE_NAME: XML_Fixer
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_PREVIEWS: true
@@ -45,8 +45,8 @@ targets:
     info:
       path: XMLFixer/App/Info.plist
       properties:
-        CFBundleName: RPB XML Toolkit
-        CFBundleDisplayName: RPB XML Toolkit
+        CFBundleName: Republic Wash & Cut
+        CFBundleDisplayName: Republic Wash & Cut
         CFBundleIdentifier: com.xmlfixer.XMLFixer
         CFBundleVersion: "12"
         CFBundleShortVersionString: "1.1.0"
@@ -73,7 +73,7 @@ targets:
       base:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.xmlfixer.XMLFixerTests
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/RPB XML Toolkit.app/Contents/MacOS/RPB XML Toolkit"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Republic Wash & Cut.app/Contents/MacOS/Republic Wash & Cut"
         BUNDLE_LOADER: "$(TEST_HOST)"
 schemes:
   XMLFixer:

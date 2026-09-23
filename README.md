@@ -1,11 +1,14 @@
-# RPB XML Toolkit
+# Republic Wash & Cut
 
 **A fast, native macOS workspace for repairing and preparing Final Cut Pro XML.**
 
-RPB XML Toolkit helps post-production teams inspect, clean up, relink, and export
+Republic Wash & Cut helps post-production teams inspect, clean up, relink, and export
 large batches of Final Cut Pro `xmeml` v4/v5 XML files. It keeps the original XML
 structure in memory while giving you a practical visual workspace for media,
 timelines, source timecode, and reference video.
+
+Republic Wash & Cut is built on top of the ReplayBoys (RPB) XML Toolkit by
+[dr1pvfx](https://github.com/dr1pvfx/xml-fixer), which it renames and extends.
 
 > **Alpha software:** The current public build is intended for evaluation on
 > copies of your project XML. Keep backups of original media and timelines.
@@ -124,7 +127,7 @@ trims each file and verifies codec, audio tracks, keyframe alignment, and timeco
 The local release app is written to:
 
 ```text
-/tmp/xml-fixer-derived/Build/Products/Release/RPB XML Toolkit.app
+/tmp/xml-fixer-derived/Build/Products/Release/Republic Wash & Cut.app
 ```
 
 ## Project structure

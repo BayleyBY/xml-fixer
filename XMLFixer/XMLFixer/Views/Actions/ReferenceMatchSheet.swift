@@ -155,7 +155,9 @@ struct ReferenceMatchSheet: View {
             }
         }
         .padding()
-        .frame(width: 850, height: 550)
+        .frame(minWidth: 850, idealWidth: 850, maxWidth: .infinity,
+               minHeight: 550, idealHeight: 550, maxHeight: .infinity)
+        .resizableSheet(minSize: CGSize(width: 850, height: 550))
     }
 
     private func browseForFolder() {

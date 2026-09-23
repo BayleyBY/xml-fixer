@@ -104,7 +104,14 @@ struct SourcesExportSheet: View {
                         }
 
                         Section("Output") {
-                            Picker("Sequence Timebase", selection: $appState.sourcesExportOptions.sequenceTimebase) {
+                            Picker("Sequence Timebase", selection: Binding(
+                                get: { appState.sourcesExportOptions.sequenceTimebase },
+                                set: { timebase in
+                                    appState.sourcesExportOptions.sequenceTimebase = timebase
+                                    // 23.976 and 29.97 are NTSC rates on a 24/30 timebase.
+                                    appState.sourcesExportOptions.ntsc = timebase != 25
+                                }
+                            )) {
                                 Text("23.976 fps").tag(24)
                                 Text("25 fps").tag(25)
                                 Text("29.97 fps").tag(30)
@@ -179,7 +186,9 @@ struct SourcesExportSheet: View {
             }
             .padding(16)
         }
-        .frame(width: 900, height: 560)
+        .frame(minWidth: 900, idealWidth: 900, maxWidth: .infinity,
+               minHeight: 560, idealHeight: 560, maxHeight: .infinity)
+        .resizableSheet(minSize: CGSize(width: 900, height: 560))
         .onAppear {
             rawSummaries = SourcesSequenceBuilder.collectUsages(from: appState.documents)
         }

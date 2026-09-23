@@ -55,7 +55,8 @@ struct BatchRenameTimelinesSheet: View {
                 }
             }
             .formStyle(.grouped)
-            .frame(width: 400)
+            .frame(minWidth: 400, idealWidth: 400, maxWidth: .infinity)
+            .fixedSize(horizontal: false, vertical: true)
 
             // Preview
             GroupBox("Preview (first \(min(targetSequences.count, 15)) of \(targetSequences.count))") {
@@ -80,7 +81,7 @@ struct BatchRenameTimelinesSheet: View {
                     }
                     .padding(8)
                 }
-                .frame(height: 200)
+                .frame(minHeight: 200, maxHeight: .infinity)
             }
 
             HStack {
@@ -102,7 +103,8 @@ struct BatchRenameTimelinesSheet: View {
             }
         }
         .padding()
-        .frame(width: 550)
+        .frame(minWidth: 550, idealWidth: 550, maxWidth: .infinity, maxHeight: .infinity)
+        .resizableSheet(minSize: CGSize(width: 550, height: 536))
     }
 
     private var currentOperation: BatchOperation {

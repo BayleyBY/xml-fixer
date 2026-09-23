@@ -12,7 +12,7 @@ final class AppWorkflowSmokeTests: XCTestCase {
 
     override func setUpWithError() throws {
         tempRoot = FileManager.default.temporaryDirectory
-            .appendingPathComponent("RPBXMLToolkitSmoke-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("RepublicWashCutSmoke-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: tempRoot, withIntermediateDirectories: true)
     }
 

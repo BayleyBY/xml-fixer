@@ -2,9 +2,10 @@
 
 ## Project at a glance
 
-RPB XML Toolkit is a native SwiftUI macOS application (macOS 14+) for inspecting,
+Republic Wash & Cut is a native SwiftUI macOS application (macOS 14+) for inspecting,
 repairing, relinking, and exporting Final Cut Pro `xmeml` v4/v5 XML. The Xcode
-project remains named `XMLFixer`; the distributed product is **RPB XML Toolkit**.
+project remains named `XMLFixer`; the distributed product is **Republic Wash & Cut**,
+a renamed and extended fork of the ReplayBoys (RPB) XML Toolkit.
 It has no third-party runtime dependencies.
 
 Read [`CLAUDE.md`](CLAUDE.md) for the detailed application architecture, XML data
