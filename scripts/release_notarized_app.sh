@@ -74,6 +74,7 @@ build_app() {
   echo "==> Building $APP_NAME ($CONFIGURATION)"
   remove_path_if_exists "$DERIVED_DATA_PATH"
   xcodebuild \
+    -project "$PROJECT_DIR/XMLFixer.xcodeproj" \
     -scheme "$SCHEME" \
     -configuration "$CONFIGURATION" \
     -derivedDataPath "$DERIVED_DATA_PATH" \
