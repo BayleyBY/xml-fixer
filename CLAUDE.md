@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-**RPB XML Toolkit** (Xcode project still named `XMLFixer`) is a SwiftUI macOS app (14.0+) for batch-processing Final Cut Pro (FCP) XML files. It provides a GUI for loading hundreds of XMLs, inspecting/editing media references and timelines, relinking paths, repairing reel metadata, trimming camera originals to the used ranges, and exporting modified XMLs. It also includes a synced reference video player and timeline visualization. Zero bundled dependencies — Foundation, SwiftUI, AVFoundation, and AppKit only. REDline (from REDCINE-X Pro) is an optional external tool used at runtime for R3D trimming when present.
+**Republic Wash & Cut** (Xcode project still named `XMLFixer`) is a SwiftUI macOS app (14.0+) for batch-processing Final Cut Pro (FCP) XML files. It provides a GUI for loading hundreds of XMLs, inspecting/editing media references and timelines, relinking paths, repairing reel metadata, trimming camera originals to the used ranges, and exporting modified XMLs. It also includes a synced reference video player and timeline visualization. Zero bundled dependencies — Foundation, SwiftUI, AVFoundation, and AppKit only. REDline (from REDCINE-X Pro) is an optional external tool used at runtime for R3D trimming when present.
+
+The app is a renamed, extended fork of the **ReplayBoys (RPB) XML Toolkit**; keep that lineage in the docs. The Xcode project, scheme, target, and bundle ID (`com.xmlfixer.XMLFixer`) all remain `XMLFixer`.
 
 The Python scripts in the repo root (`clean_xmls.py`, `xml-name-copy.py`) are standalone utilities unrelated to the Swift app.
 
@@ -51,7 +53,7 @@ TEST_RUNNER_XMLFIXER_R3D_DIR="/path/to/RED/clips" xcodebuild ... test   # R3DTri
 #   drop .mov/.mp4 files into "$TMPDIR/qt-trim-manual/"                  # QuickTimeTrimManualMediaTests
 ```
 
-The Debug app lands at `$DD/Build/Products/Debug/RPB XML Toolkit.app`; launch it with `open -a "<that path>" some.xml`. Release builds go through `scripts/release_notarized_app.sh` (Developer ID, unsandboxed) or `scripts/release_app_store.sh` (`AppStore` configuration, sandboxed); both write to `builds/`, which is git-ignored. Test env vars must be passed as shell environment `TEST_RUNNER_<NAME>=...`, not as xcodebuild `KEY=VALUE` arguments. A first build occasionally fails with a message-less SwiftCompile error; simply rerun.
+The Debug app lands at `$DD/Build/Products/Debug/Republic Wash & Cut.app`; launch it with `open -a "<that path>" some.xml`. Release builds go through `scripts/release_notarized_app.sh` (Developer ID, unsandboxed) or `scripts/release_app_store.sh` (`AppStore` configuration, sandboxed); both write to `builds/`, which is git-ignored. Test env vars must be passed as shell environment `TEST_RUNNER_<NAME>=...`, not as xcodebuild `KEY=VALUE` arguments. A first build occasionally fails with a message-less SwiftCompile error; simply rerun.
 
 Test fixtures live in `XMLFixerTests/Fixtures/sample_sequence.xml`. Trim tests synthesize ProRes/H.264 movies with `AVAssetWriter` at test time; `QuickTimeTrimManualMediaTests` additionally trims any movie found in `$TMPDIR/qt-trim-manual/` (skipped when empty).
 

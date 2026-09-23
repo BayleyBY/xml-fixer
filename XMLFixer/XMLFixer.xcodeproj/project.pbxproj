@@ -629,7 +629,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixerTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RPB XML Toolkit.app/Contents/MacOS/RPB XML Toolkit";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Republic Wash & Cut.app/Contents/MacOS/Republic Wash & Cut";
 			};
 			name = Debug;
 		};
@@ -762,7 +762,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixer;
 				PRODUCT_MODULE_NAME = XML_Fixer;
-				PRODUCT_NAME = "RPB XML Toolkit";
+				PRODUCT_NAME = "Republic Wash & Cut";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -780,7 +780,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixerTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RPB XML Toolkit.app/Contents/MacOS/RPB XML Toolkit";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Republic Wash & Cut.app/Contents/MacOS/Republic Wash & Cut";
 			};
 			name = AppStore;
 		};
@@ -797,7 +797,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixerTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RPB XML Toolkit.app/Contents/MacOS/RPB XML Toolkit";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Republic Wash & Cut.app/Contents/MacOS/Republic Wash & Cut";
 			};
 			name = Release;
 		};
@@ -882,7 +882,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixer;
 				PRODUCT_MODULE_NAME = XML_Fixer;
-				PRODUCT_NAME = "RPB XML Toolkit";
+				PRODUCT_NAME = "Republic Wash & Cut";
 				SDKROOT = macosx;
 			};
 			name = AppStore;
@@ -905,7 +905,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xmlfixer.XMLFixer;
 				PRODUCT_MODULE_NAME = XML_Fixer;
-				PRODUCT_NAME = "RPB XML Toolkit";
+				PRODUCT_NAME = "Republic Wash & Cut";
 				SDKROOT = macosx;
 			};
 			name = Release;

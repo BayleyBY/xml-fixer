@@ -12,6 +12,8 @@ _Last updated: 2026-09-16 — fork `BayleyBY/xml-fixer`, branch `master` (merge 
 | Toolchain verified | Xcode 26.6, macOS 26.5, XcodeGen 2.46 |
 | Test suite | 58 XCTest cases passing (plus 2 opt-in manual tests) |
 
+The product is now named **Republic Wash & Cut**; it was built on top of the ReplayBoys (RPB) XML Toolkit, which supplies the upstream base below.
+
 ## What this fork adds over upstream
 
 ### Trim camera originals (new)

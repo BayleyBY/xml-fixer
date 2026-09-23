@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_DIR="$ROOT_DIR/XMLFixer"
-APP_NAME="${APP_NAME:-RPB XML Toolkit}"
+APP_NAME="${APP_NAME:-Republic Wash & Cut}"
 SCHEME="${SCHEME:-XMLFixer}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 DERIVED_DATA_PATH="${DERIVED_DATA_PATH:-$PROJECT_DIR/build_notarized}"

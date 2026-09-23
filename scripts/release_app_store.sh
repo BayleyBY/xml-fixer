@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_DIR="$ROOT_DIR/XMLFixer"
 PROJECT_PATH="$PROJECT_DIR/XMLFixer.xcodeproj"
-APP_NAME="${APP_NAME:-RPB XML Toolkit}"
+APP_NAME="${APP_NAME:-Republic Wash & Cut}"
 SCHEME="${SCHEME:-XMLFixer}"
 # AppStore configuration = Release settings + App Sandbox (see XMLFixer/project.yml).
 CONFIGURATION="${CONFIGURATION:-AppStore}"
