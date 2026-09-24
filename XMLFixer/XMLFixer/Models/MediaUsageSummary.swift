@@ -46,9 +46,14 @@ struct MediaUsageSummary: Identifiable {
         // Expand each range by speed-adjusted handles
         var expanded = rawRanges.map { range in
             let adjustedHandles = Int(ceil(Double(handles) * range.speedFactor))
+            let inPoint = max(0, range.inPoint - adjustedHandles)
+            // Slugs and ID-only file stubs report a duration of 0, so clamping the out
+            // point to it would invert the range. Only clamp a duration we actually know.
+            let extended = range.outPoint + adjustedHandles
+            let clamped = sourceDuration > 0 ? min(sourceDuration, extended) : extended
             return SourceRange(
-                inPoint: max(0, range.inPoint - adjustedHandles),
-                outPoint: min(sourceDuration, range.outPoint + adjustedHandles),
+                inPoint: inPoint,
+                outPoint: max(inPoint + 1, clamped),
                 speedFactor: range.speedFactor
             )
         }

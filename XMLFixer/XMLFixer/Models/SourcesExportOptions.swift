@@ -7,6 +7,7 @@ struct SourcesExportOptions {
     var sequenceTimebase: Int = 24    // with ntsc = true → 23.976 fps
     var ntsc: Bool = true
     var includeAudio: Bool = false
+    var replaceLoadedXMLs: Bool = false   // clear the loaded XMLs and open the exported one
     var outputDirectory: URL?
     var outputFilename: String = "Sources_Sequence.xml"
 }

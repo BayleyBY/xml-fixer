@@ -557,9 +557,29 @@ final class AppState {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             do {
                 let url = try SourcesSequenceBuilder.export(documents: docs, options: opts)
-                DispatchQueue.main.async {
-                    self?.isProcessing = false
-                    self?.setStatus("Exported Sources Sequence to \(url.lastPathComponent)")
+
+                guard opts.replaceLoadedXMLs else {
+                    DispatchQueue.main.async {
+                        self?.isProcessing = false
+                        self?.setStatus("Exported Sources Sequence to \(url.lastPathComponent)")
+                    }
+                    return
+                }
+
+                // The export itself already succeeded, so a parse failure here must not
+                // be reported as an export failure.
+                do {
+                    let newDoc = try FCPXMLParser.parse(url: url)
+                    DispatchQueue.main.async {
+                        self?.isProcessing = false
+                        self?.replaceAllDocuments(with: newDoc)
+                        self?.setStatus("Exported and loaded \(url.lastPathComponent)")
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        self?.isProcessing = false
+                        self?.setStatus("Exported \(url.lastPathComponent), but loading it failed: \(error.localizedDescription)")
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -568,6 +588,21 @@ final class AppState {
                 }
             }
         }
+    }
+
+    /// Drops every loaded XML in favour of a single new one. Nothing in the old list
+    /// survives, so undo history, selections, and reference links all reset.
+    private func replaceAllDocuments(with doc: FCPXMLDocument) {
+        undoStack.removeAll()
+        closeVideoPlayer()
+        referenceMatches = [:]
+        selectedDocumentIDs = []
+        selectedMediaIDs = []
+        selectedTimelineClip = nil
+        playheadFrame = 0
+        documents = [doc]
+        selectedSequenceID = doc.sequences.first?.id
+        refreshMediaReferences()
     }
 
     func denestAllSequences() {

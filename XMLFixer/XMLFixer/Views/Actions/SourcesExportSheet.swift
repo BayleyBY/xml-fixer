@@ -119,6 +119,18 @@ struct SourcesExportSheet: View {
 
                             Toggle("Include Audio Tracks", isOn: $appState.sourcesExportOptions.includeAudio)
                                 .toggleStyle(.checkbox)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Toggle(
+                                    "Replace Current XML List with the Sources XML",
+                                    isOn: $appState.sourcesExportOptions.replaceLoadedXMLs
+                                )
+                                .toggleStyle(.checkbox)
+
+                                Text("Closes the loaded XMLs after export and opens the new Sources XML. Undo history and reference links are cleared.")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
                     }
                     .formStyle(.grouped)
