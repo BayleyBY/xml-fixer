@@ -43,6 +43,35 @@ final class AppWorkflowSmokeTests: XCTestCase {
         try await exerciseReferenceMatching(appState: appState, sequence: sequence)
     }
 
+    func testSourcesExportCanReplaceTheLoadedXMLs() throws {
+        let appState = AppState()
+        appState.importFiles(urls: [fixtureURL])
+        waitUntil("XML import") { !appState.isProcessing }
+        XCTAssertEqual(appState.documents.count, 1)
+
+        let originalDocumentID = try XCTUnwrap(appState.documents.first?.id)
+        appState.selectedMediaIDs = Set(appState.mediaReferences.map(\.id))
+
+        let outputDir = tempRoot.appendingPathComponent("SourcesReplace", isDirectory: true)
+        try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
+        appState.sourcesExportOptions.outputDirectory = outputDir
+        appState.sourcesExportOptions.outputFilename = "Sources_Replace.xml"
+        appState.sourcesExportOptions.replaceLoadedXMLs = true
+
+        appState.exportSourcesSequence()
+        waitUntil("Sources XML export and reload") { !appState.isProcessing }
+        waitUntil("loaded document swap") { appState.documents.first?.id != originalDocumentID }
+
+        XCTAssertEqual(appState.documents.count, 1)
+        let loaded = try XCTUnwrap(appState.documents.first)
+        XCTAssertEqual(loaded.sourceURL.lastPathComponent, "Sources_Replace.xml")
+        XCTAssertFalse(appState.mediaReferences.isEmpty)
+        XCTAssertEqual(appState.selectedSequenceID, loaded.sequences.first?.id)
+        XCTAssertNotNil(appState.currentTimelineData)
+        XCTAssertTrue(appState.selectedMediaIDs.isEmpty)
+        XCTAssertFalse(appState.canUndo)
+    }
+
     private func exerciseRelink(appState: AppState) throws {
         let conformDir = tempRoot.appendingPathComponent("Conform", isDirectory: true)
         try FileManager.default.createDirectory(at: conformDir, withIntermediateDirectories: true)
