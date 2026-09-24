@@ -185,7 +185,7 @@ struct SourcesSequenceBuilder {
 
             var isFirstReference = true
 
-            for range in summary.mergedRanges {
+            for range in summary.mergedRanges where range.length > 0 {
                 clipCounter += 1
 
                 let sourceLength = range.length
@@ -197,14 +197,16 @@ struct SourcesSequenceBuilder {
                 }
 
                 let clipStart = timelinePosition
-                let clipEnd = timelinePosition + timelineLength
+                let clipEnd = timelinePosition + max(1, timelineLength)
+                // A file whose duration is unknown still needs one long enough to hold the out point.
+                let clipDuration = max(summary.sourceDuration, range.outPoint)
 
                 // Video clipitem
                 let clipitem = XMLElement(name: "clipitem")
                 clipitem.addAttribute(XMLNode.attribute(withName: "id", stringValue: "clipitem-\(clipCounter)") as! XMLNode)
                 addChild(to: clipitem, name: "name", value: summary.filename)
                 addChild(to: clipitem, name: "enabled", value: "TRUE")
-                addChild(to: clipitem, name: "duration", value: String(summary.sourceDuration))
+                addChild(to: clipitem, name: "duration", value: String(clipDuration))
                 addRateElement(to: clipitem, timebase: summary.timebase, ntsc: summary.ntsc)
                 addChild(to: clipitem, name: "start", value: String(clipStart))
                 addChild(to: clipitem, name: "end", value: String(clipEnd))
@@ -233,7 +235,7 @@ struct SourcesSequenceBuilder {
                         audioClip.addAttribute(XMLNode.attribute(withName: "id", stringValue: "clipitem-\(clipCounter)-audio-\(ch)") as! XMLNode)
                         addChild(to: audioClip, name: "name", value: summary.filename)
                         addChild(to: audioClip, name: "enabled", value: "TRUE")
-                        addChild(to: audioClip, name: "duration", value: String(summary.sourceDuration))
+                        addChild(to: audioClip, name: "duration", value: String(clipDuration))
                         addRateElement(to: audioClip, timebase: summary.timebase, ntsc: summary.ntsc)
                         addChild(to: audioClip, name: "start", value: String(clipStart))
                         addChild(to: audioClip, name: "end", value: String(clipEnd))

@@ -55,6 +55,78 @@ final class SourcesSequenceBuilderTests: XCTestCase {
         XCTAssertEqual(summary.mergedRanges[1].outPoint, 610)
     }
 
+    func testMergeRangesWithUnknownSourceDuration() {
+        // Slugs ("Black Video") and ID-only <file> stubs parse as duration 0; handles
+        // must not clamp the out point down to it and invert the range.
+        var summary = MediaUsageSummary(
+            filename: "Black Video",
+            pathURL: nil,
+            sourceDuration: 0,
+            timebase: 30,
+            ntsc: true,
+            hasVideo: true,
+            hasAudio: false,
+            audioChannelCount: 0,
+            rawRanges: [SourceRange(inPoint: 86_289, outPoint: 86_349)]
+        )
+        summary.mergeRanges(handles: 24, mergeThreshold: 96)
+
+        XCTAssertEqual(summary.mergedRanges.count, 1)
+        let range = summary.mergedRanges[0]
+        XCTAssertEqual(range.inPoint, 86_265)
+        XCTAssertEqual(range.outPoint, 86_373)
+        XCTAssertGreaterThan(range.length, 0)
+    }
+
+    func testBuildXMLLaysOutClipsForwardWithUnknownDurations() throws {
+        var known = MediaUsageSummary(
+            filename: "A_0012_001_h3F2A.mov",
+            pathURL: "file://localhost/tmp/A_0012_001_h3F2A.mov",
+            sourceDuration: 1000,
+            timebase: 24,
+            ntsc: false,
+            hasVideo: true,
+            hasAudio: false,
+            audioChannelCount: 0,
+            rawRanges: [SourceRange(inPoint: 100, outPoint: 200)]
+        )
+        var slug = MediaUsageSummary(
+            filename: "Black Video",
+            pathURL: nil,
+            sourceDuration: 0,
+            timebase: 30,
+            ntsc: true,
+            hasVideo: true,
+            hasAudio: false,
+            audioChannelCount: 0,
+            rawRanges: [SourceRange(inPoint: 86_289, outPoint: 86_349)]
+        )
+        known.mergeRanges(handles: 24, mergeThreshold: 96)
+        slug.mergeRanges(handles: 24, mergeThreshold: 96)
+
+        let xmlDoc = SourcesSequenceBuilder.buildXML(from: [known, slug], options: SourcesExportOptions())
+        let root = try XCTUnwrap(xmlDoc.rootElement())
+
+        let sequenceDuration = try XCTUnwrap((try root.nodes(forXPath: "//sequence/duration")).first?.stringValue.flatMap(Int.init))
+        XCTAssertGreaterThan(sequenceDuration, 0)
+
+        let clips = try root.nodes(forXPath: "//sequence/media/video/track/clipitem").compactMap { $0 as? XMLElement }
+        XCTAssertEqual(clips.count, 2)
+        var previousEnd = 0
+        for clip in clips {
+            let start = try XCTUnwrap(clip.singleIntValue(forXPath: "start"))
+            let end = try XCTUnwrap(clip.singleIntValue(forXPath: "end"))
+            let inPoint = try XCTUnwrap(clip.singleIntValue(forXPath: "in"))
+            let outPoint = try XCTUnwrap(clip.singleIntValue(forXPath: "out"))
+            let duration = try XCTUnwrap(clip.singleIntValue(forXPath: "duration"))
+            XCTAssertEqual(start, previousEnd)
+            XCTAssertGreaterThan(end, start)
+            XCTAssertGreaterThan(outPoint, inPoint)
+            XCTAssertGreaterThanOrEqual(duration, outPoint)
+            previousEnd = end
+        }
+    }
+
     func testMergeRangesHandlesCausesMerge() {
         var summary = MediaUsageSummary(
             filename: "test.mov",
