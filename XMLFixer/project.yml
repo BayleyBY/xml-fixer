@@ -48,8 +48,8 @@ targets:
         CFBundleName: Republic Wash & Cut
         CFBundleDisplayName: Republic Wash & Cut
         CFBundleIdentifier: com.xmlfixer.XMLFixer
-        CFBundleVersion: "12"
-        CFBundleShortVersionString: "1.1.0"
+        CFBundleVersion: "13"
+        CFBundleShortVersionString: "1.2.0"
         CFBundlePackageType: APPL
         CFBundleExecutable: "$(EXECUTABLE_NAME)"
         LSApplicationCategoryType: public.app-category.video
