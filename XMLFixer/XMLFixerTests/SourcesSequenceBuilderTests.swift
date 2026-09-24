@@ -55,6 +55,97 @@ final class SourcesSequenceBuilderTests: XCTestCase {
         XCTAssertEqual(summary.mergedRanges[1].outPoint, 610)
     }
 
+    // MARK: - Virtual source filtering
+
+    private func clipitem(name: String, fileBody: String, clipExtras: String = "") throws -> (XMLElement, XMLElement) {
+        let xml = """
+        <clipitem id="c1">
+            <name>\(name)</name>
+            <in>100</in>
+            <out>200</out>
+            \(clipExtras)
+            <file id="f1">\(fileBody)</file>
+        </clipitem>
+        """
+        let doc = try XMLDocument(xmlString: xml, options: [])
+        let clip = try XCTUnwrap(doc.rootElement())
+        let file = try XCTUnwrap((try clip.nodes(forXPath: "file")).first as? XMLElement)
+        return (clip, file)
+    }
+
+    func testSlugsAndGeneratorsCountAsVirtualSources() throws {
+        let (slugClip, slugFile) = try clipitem(
+            name: "Black Video",
+            fileBody: "<name>Black Video</name><mediaSource>Slug</mediaSource>"
+        )
+        XCTAssertTrue(SourcesSequenceBuilder.isVirtualSource(clipElem: slugClip, fileElem: slugFile, filename: "Black Video"))
+
+        let (genClip, genFile) = try clipitem(
+            name: "Color",
+            fileBody: "<name>Color</name>",
+            clipExtras: "<effect><name>Color</name><effectcategory>Generator</effectcategory></effect>"
+        )
+        XCTAssertTrue(SourcesSequenceBuilder.isVirtualSource(clipElem: genClip, fileElem: genFile, filename: "Color"))
+
+        let (barelyNamed, barelyNamedFile) = try clipitem(name: "Slug", fileBody: "<name>Slug</name>")
+        XCTAssertTrue(SourcesSequenceBuilder.isVirtualSource(clipElem: barelyNamed, fileElem: barelyNamedFile, filename: "Slug"))
+    }
+
+    func testStillsAndMoviesAreNotVirtualSources() throws {
+        for filename in ["LOGO_rev.png", "frame.jpg", "artwork.psd", "art.tif", "shot.mov", "take.mxf"] {
+            // ID-only stub: no pathurl, no metadata — the extension is all we have.
+            let (stubClip, stubFile) = try clipitem(name: filename, fileBody: "")
+            XCTAssertFalse(
+                SourcesSequenceBuilder.isVirtualSource(clipElem: stubClip, fileElem: stubFile, filename: filename),
+                "\(filename) must survive as a real source"
+            )
+
+            let (fullClip, fullFile) = try clipitem(
+                name: filename,
+                fileBody: "<name>\(filename)</name><pathurl>file://localhost/tmp/\(filename)</pathurl>"
+            )
+            XCTAssertFalse(
+                SourcesSequenceBuilder.isVirtualSource(clipElem: fullClip, fileElem: fullFile, filename: filename),
+                "\(filename) with a path must survive as a real source"
+            )
+        }
+    }
+
+    func testCollectUsagesSkipsSlugsButKeepsStills() throws {
+        let xml = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE xmeml>
+        <xmeml version="4">
+          <sequence id="s1"><name>Edit</name>
+            <media><video><track>
+              <clipitem id="c1"><name>Black Video</name><in>10</in><out>50</out>
+                <file id="f1"><name>Black Video</name><mediaSource>Slug</mediaSource></file>
+              </clipitem>
+              <clipitem id="c2"><name>LOGO.png</name><in>0</in><out>40</out>
+                <file id="f2"></file>
+              </clipitem>
+              <clipitem id="c2b"><name>LOGO.png</name><in>60</in><out>90</out>
+                <file id="f2"><name>LOGO.png</name></file>
+              </clipitem>
+              <clipitem id="c3"><name>shot.mov</name><in>100</in><out>200</out>
+                <file id="f3"><name>shot.mov</name><pathurl>file://localhost/tmp/shot.mov</pathurl><duration>900</duration></file>
+              </clipitem>
+            </track></video></media>
+          </sequence>
+        </xmeml>
+        """
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("slug_mix-\(UUID().uuidString).xml")
+        try xml.write(to: url, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let doc = try FCPXMLParser.parse(url: url)
+
+        let names = Set(SourcesSequenceBuilder.collectUsages(from: [doc]).map(\.filename))
+        XCTAssertFalse(names.contains("Black Video"))
+        XCTAssertTrue(names.contains("LOGO.png"))
+        XCTAssertTrue(names.contains("shot.mov"))
+    }
+
     func testMergeRangesWithUnknownSourceDuration() {
         // Slugs ("Black Video") and ID-only <file> stubs parse as duration 0; handles
         // must not clamp the out point down to it and invert the range.

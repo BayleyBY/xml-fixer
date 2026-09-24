@@ -29,6 +29,9 @@ struct SourcesSequenceBuilder {
                 }()
                 guard let resolvedName = filename else { continue }
 
+                let metadataFile = fileElements[fileID] ?? fileElem
+                guard !isVirtualSource(clipElem: clipElem, fileElem: metadataFile, filename: resolvedName) else { continue }
+
                 guard let inPoint = clipElem.singleIntValue(forXPath: "in"),
                       let outPoint = clipElem.singleIntValue(forXPath: "out"),
                       inPoint >= 0, outPoint > inPoint
@@ -84,6 +87,42 @@ struct SourcesSequenceBuilder {
 
         return Array(summaryByFilename.values)
             .sorted { $0.filename.localizedCaseInsensitiveCompare($1.filename) == .orderedAscending }
+    }
+
+    /// True for generators — slugs, color mattes, titles, shapes — which have no media to
+    /// conform or trim. Stills (png/jpg/psd/…) are real media and must never match, even
+    /// when their `<file>` is an ID-only stub with no pathurl.
+    static func isVirtualSource(clipElem: XMLElement, fileElem: XMLElement, filename: String) -> Bool {
+        // FCP writes <mediaSource>Slug</mediaSource> (Color, Text, …) in place of real media.
+        if let mediaSource = fileElem.singleStringValue(forXPath: "mediaSource"), !mediaSource.isEmpty {
+            return true
+        }
+
+        // A generator clipitem carries its own effect rather than a filter on real media.
+        if let effects = try? clipElem.nodes(forXPath: "effect") {
+            for case let effect as XMLElement in effects {
+                let category = effect.singleStringValue(forXPath: "effectcategory") ?? ""
+                let type = effect.singleStringValue(forXPath: "effecttype") ?? ""
+                if category.caseInsensitiveCompare("Generator") == .orderedSame
+                    || type.caseInsensitiveCompare("generator") == .orderedSame {
+                    return true
+                }
+            }
+        }
+
+        // Left with no path at all: a real file still names its format ("LOGO.png"),
+        // while a generator is just a label ("Black Video").
+        let hasPath = !(fileElem.singleStringValue(forXPath: "pathurl") ?? "").isEmpty
+        if !hasPath, !hasFileExtension(filename) {
+            return true
+        }
+
+        return false
+    }
+
+    private static func hasFileExtension(_ filename: String) -> Bool {
+        let ext = (filename as NSString).pathExtension
+        return !ext.isEmpty && ext.count <= 5 && ext.allSatisfy { $0.isLetter || $0.isNumber }
     }
 
     // MARK: - Phase 2: Merge Ranges
