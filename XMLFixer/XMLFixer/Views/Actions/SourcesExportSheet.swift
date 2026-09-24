@@ -217,8 +217,10 @@ struct SourcesExportSheet: View {
 struct SourcesTimelinePreview: View {
     let summaries: [MediaUsageSummary]
 
-    private let trackHeight: CGFloat = 20
-    private let labelWidth: CGFloat = 120
+    private let minTrackHeight: CGFloat = 20
+    private let maxTrackHeight: CGFloat = 44
+    private let insetH: CGFloat = 10
+    private let insetV: CGFloat = 8
 
     private var activeSummaries: [MediaUsageSummary] {
         summaries.filter { !$0.mergedRanges.isEmpty }
@@ -230,69 +232,84 @@ struct SourcesTimelinePreview: View {
     ]
 
     var body: some View {
-        ScrollView([.horizontal, .vertical]) {
-            VStack(alignment: .leading, spacing: 1) {
-                ForEach(Array(activeSummaries.enumerated()), id: \.element.id) { idx, summary in
-                    let color = Self.colors[idx % Self.colors.count]
+        GeometryReader { geo in
+            // Rows and labels grow with the panel, so a resized window shows a bigger
+            // preview rather than the same small one in more empty space.
+            let available = max(minTrackHeight, geo.size.height - insetV * 2)
+            let rowCount = CGFloat(max(1, activeSummaries.count))
+            let trackHeight = min(maxTrackHeight, max(minTrackHeight, available / rowCount - 1))
+            let contentWidth = max(120, geo.size.width - insetH * 2)
+            let labelWidth = min(280, max(120, contentWidth * 0.22))
+            let nameFontSize = min(13, max(9, trackHeight * 0.45))
+            let rangeFontSize = min(11, max(8, trackHeight * 0.36))
 
-                    HStack(spacing: 0) {
-                        // Filename label
-                        Text(summary.filename)
-                            .font(.system(size: 9, design: .monospaced))
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                            .frame(width: labelWidth, alignment: .trailing)
-                            .padding(.trailing, 4)
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: 1) {
+                    ForEach(Array(activeSummaries.enumerated()), id: \.element.id) { idx, summary in
+                        let color = Self.colors[idx % Self.colors.count]
 
-                        // Range blocks
-                        ZStack(alignment: .leading) {
-                            // Track background
-                            Rectangle()
-                                .fill(Color.gray.opacity(idx % 2 == 0 ? 0.1 : 0.07))
-                                .frame(height: trackHeight)
+                        HStack(spacing: 0) {
+                            // Filename label
+                            Text(summary.filename)
+                                .font(.system(size: nameFontSize, design: .monospaced))
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .frame(width: labelWidth, alignment: .trailing)
+                                .padding(.trailing, 4)
 
-                            // Source duration indicator (full width, very subtle)
-                            GeometryReader { geo in
-                                let totalWidth = geo.size.width
+                            // Range blocks
+                            ZStack(alignment: .leading) {
+                                // Track background
+                                Rectangle()
+                                    .fill(Color.gray.opacity(idx % 2 == 0 ? 0.1 : 0.07))
+                                    .frame(height: trackHeight)
 
-                                // Merged range blocks
-                                ForEach(Array(summary.mergedRanges.enumerated()), id: \.offset) { _, range in
-                                    let maxDur = max(1, Double(summary.sourceDuration))
-                                    let x = totalWidth * Double(range.inPoint) / maxDur
-                                    let w = max(3, totalWidth * Double(range.length) / maxDur)
+                                // Source duration indicator (full width, very subtle)
+                                GeometryReader { trackGeo in
+                                    let totalWidth = trackGeo.size.width
 
-                                    RoundedRectangle(cornerRadius: 2)
-                                        .fill(color.opacity(0.7))
-                                        .overlay(alignment: .leading) {
-                                            if w > 40 {
-                                                Text(formatRange(range, timebase: summary.timebase))
-                                                    .font(.system(size: 8, design: .monospaced))
-                                                    .foregroundStyle(.white.opacity(0.8))
-                                                    .lineLimit(1)
-                                                    .padding(.leading, 3)
+                                    // Merged range blocks
+                                    ForEach(Array(summary.mergedRanges.enumerated()), id: \.offset) { _, range in
+                                        let maxDur = max(1, Double(summary.sourceDuration))
+                                        let x = totalWidth * Double(range.inPoint) / maxDur
+                                        let w = max(3, totalWidth * Double(range.length) / maxDur)
+
+                                        RoundedRectangle(cornerRadius: 2)
+                                            .fill(color.opacity(0.7))
+                                            .overlay(alignment: .leading) {
+                                                if w > 40 {
+                                                    Text(formatRange(range, timebase: summary.timebase))
+                                                        .font(.system(size: rangeFontSize, design: .monospaced))
+                                                        .foregroundStyle(.white.opacity(0.8))
+                                                        .lineLimit(1)
+                                                        .padding(.leading, 3)
+                                                }
                                             }
-                                        }
-                                        .frame(width: w, height: trackHeight - 4)
-                                        .offset(x: x, y: 2)
+                                            .frame(width: w, height: trackHeight - 4)
+                                            .offset(x: x, y: 2)
 
-                                    // Speed indicator
-                                    if range.speedFactor != 1.0 {
-                                        let speedLabel = String(format: "%.0f%%", range.speedFactor * 100)
-                                        Text(speedLabel)
-                                            .font(.system(size: 7, weight: .bold))
-                                            .foregroundStyle(.orange)
-                                            .offset(x: x + w - 20, y: -1)
+                                        // Speed indicator
+                                        if range.speedFactor != 1.0 {
+                                            let speedLabel = String(format: "%.0f%%", range.speedFactor * 100)
+                                            Text(speedLabel)
+                                                .font(.system(size: max(7, rangeFontSize - 1), weight: .bold))
+                                                .foregroundStyle(.orange)
+                                                .offset(x: x + w - 20, y: -1)
+                                        }
                                     }
                                 }
+                                .frame(height: trackHeight)
                             }
+                            .frame(maxWidth: .infinity)
                             .frame(height: trackHeight)
                         }
-                        .frame(width: 400, height: trackHeight)
+                        .frame(height: trackHeight)
                     }
-                    .frame(height: trackHeight)
                 }
+                .padding(.horizontal, insetH)
+                .padding(.vertical, insetV)
+                .frame(width: geo.size.width, alignment: .topLeading)
             }
-            .padding(.vertical, 4)
         }
         .background(Color.gray.opacity(0.08))
     }
